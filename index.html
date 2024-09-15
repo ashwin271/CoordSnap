@@ -3,75 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Upload and View with Click Marker</title>
+    <title>CoordSnap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --background-color: #f5f7fa;
+            --text-color: #34495e;
+            --border-color: #bdc3c7;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
         #drop-area {
-            border: 2px dashed #ccc;
-            border-radius: 20px;
-            width: 300px;
+            border: 2px dashed var(--primary-color);
+            border-radius: 12px;
+            width: 100%;
             height: 200px;
-            line-height: 200px;
-            text-align: center;
-            font-size: 20px;
-            color: #ccc;
-            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
         #drop-area.hover {
-            border-color: #333;
-            color: #333;
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        #image-container {
+            position: relative;
+            display: none;
+            margin-bottom: 20px;
         }
         #image-preview {
             display: block;
-            margin: 20px auto;
             max-width: 100%;
-            position: relative;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: filter 0.3s ease;
+        }
+        .grayscale {
+            filter: grayscale(100%);
         }
         .marker {
-            width: 10px;
-            height: 10px;
-            background-color: red;
+            width: 12px;
+            height: 12px;
+            background-color: var(--accent-color);
             border-radius: 50%;
             position: absolute;
             transform: translate(-50%, -50%);
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent-color);
+        }
+        .remove-button {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 18px;
+            line-height: 30px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: background-color 0.3s ease;
+            margin-bottom: 10px;
+        }
+        .remove-button:hover {
+            background-color: #c0392b;
         }
         table {
-            margin: 20px auto;
-            border-collapse: collapse;
-            width: 50%;
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 20px;
         }
         th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            background-color: var(--primary-color);
+            color: #fff;
+            font-weight: 600;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover {
+            background-color: rgba(52, 152, 219, 0.1);
         }
         #clear-button {
-            display: block;
-            margin: 20px auto;
+            display: inline-block;
             padding: 10px 20px;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        #clear-button:hover {
+            background-color: #c0392b;
+        }
+        #copy-banner {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #2ecc71;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
-    <div id="drop-area">
-        Drag & Drop Image Here or Click to Upload
+    <div class="container">
+        <h1>CoordSnap</h1>
+        <div id="drop-area">
+            Drop image here or click to upload
+        </div>
+        <input type="file" id="file-input" style="display: none;" accept="image/*">
+        <button class="remove-button" id="remove-button">&times;</button>
+        <div id="image-container">
+            <img id="image-preview" src="" alt="Image Preview">
+        </div>
+        <table id="coords-table">
+            <thead>
+                <tr>
+                    <th>X</th>
+                    <th>Y</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <button id="clear-button">Clear Points</button>
     </div>
-    <input type="file" id="file-input" style="display: none;">
-    <div id="image-container" style="position: relative;">
-        <img id="image-preview" src="" alt="Image Preview">
-    </div>
-    <table id="coords-table">
-        <thead>
-            <tr>
-                <th>X</th>
-                <th>Y</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-    <button id="clear-button">Clear Points</button>
+    <div id="copy-banner">Copied!</div>
 
     <script>
         const dropArea = document.getElementById('drop-area');
@@ -80,6 +186,8 @@
         const imageContainer = document.getElementById('image-container');
         const coordsTableBody = document.getElementById('coords-table').querySelector('tbody');
         const clearButton = document.getElementById('clear-button');
+        const removeButton = document.getElementById('remove-button');
+        const copyBanner = document.getElementById('copy-banner');
 
         dropArea.addEventListener('click', () => fileInput.click());
 
@@ -115,6 +223,8 @@
                 imagePreview.onload = () => {
                     imageContainer.style.width = imagePreview.width + 'px';
                     imageContainer.style.height = imagePreview.height + 'px';
+                    imageContainer.style.display = 'block';
+                    dropArea.style.display = 'none';
                 };
             };
             reader.readAsDataURL(file);
@@ -137,6 +247,36 @@
             const cellY = row.insertCell(1);
             cellX.textContent = x;
             cellY.textContent = y;
+
+            // Copy coordinates to clipboard
+            const coords = `${x}, ${y}`;
+            navigator.clipboard.writeText(coords).then(() => {
+                showCopyBanner(coords);
+                console.log('Coordinates copied to clipboard:', coords);
+            }).catch(err => {
+                console.error('Failed to copy coordinates:', err);
+            });
+
+            // Add hover and click event listeners to the row
+            row.addEventListener('mouseover', () => {
+                document.querySelectorAll('.marker').forEach(marker => marker.style.display = 'none');
+                marker.style.display = 'block';
+                imagePreview.classList.add('grayscale');
+            });
+
+            row.addEventListener('mouseout', () => {
+                document.querySelectorAll('.marker').forEach(marker => marker.style.display = 'block');
+                imagePreview.classList.remove('grayscale');
+            });
+
+            row.addEventListener('click', () => {
+                navigator.clipboard.writeText(coords).then(() => {
+                    showCopyBanner(coords);
+                    console.log('Coordinates copied to clipboard:', coords);
+                }).catch(err => {
+                    console.error('Failed to copy coordinates:', err);
+                });
+            });
         });
 
         clearButton.addEventListener('click', () => {
@@ -147,6 +287,30 @@
             // Clear the table
             coordsTableBody.innerHTML = '';
         });
+
+        removeButton.addEventListener('click', () => {
+            // Hide the image container and show the drop area
+            imageContainer.style.display = 'none';
+            dropArea.style.display = 'flex';
+
+            // Clear the image preview
+            imagePreview.src = '';
+
+            // Remove all markers
+            const markers = document.querySelectorAll('.marker');
+            markers.forEach(marker => marker.remove());
+
+            // Clear the table
+            coordsTableBody.innerHTML = '';
+        });
+
+        function showCopyBanner(coords) {
+            copyBanner.textContent = `Copied: ${coords}`;
+            copyBanner.style.display = 'block';
+            setTimeout(() => {
+                copyBanner.style.display = 'none';
+            }, 2000);
+        }
     </script>
 </body>
 </html>
