@@ -85,6 +85,9 @@
             box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent-color);
         }
         .remove-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
             background-color: var(--accent-color);
             color: #fff;
             border: none;
@@ -97,7 +100,6 @@
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             transition: background-color 0.3s ease;
-            margin-bottom: 10px;
         }
         .remove-button:hover {
             background-color: #c0392b;
@@ -152,6 +154,18 @@
             z-index: 1000;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            #drop-area {
+                height: 150px;
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -161,8 +175,8 @@
             Drop image here or click to upload
         </div>
         <input type="file" id="file-input" style="display: none;" accept="image/*">
-        <button class="remove-button" id="remove-button">&times;</button>
         <div id="image-container">
+            <button class="remove-button" id="remove-button">&times;</button>
             <img id="image-preview" src="" alt="Image Preview">
         </div>
         <table id="coords-table">
